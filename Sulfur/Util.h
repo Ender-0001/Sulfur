@@ -7,7 +7,7 @@
 #include <libloaderapi.h>
 #include <vector>
 
-#define SULFUR_LOG(str) std::cout << "LogSulfur: " << str << std::endl;
+#define SULFUR_LOG(str) std::cout << "LogSulfur: " << str << '\n';
 
 class Util
 {

@@ -4,8 +4,8 @@
 #define TO_STRING(val) std::to_string(val)
 
 #define PLAYER_CLASS APlayerPawn_Athena_C
-#define PLAYER_CONTROLLER_CLASS AFortPlayerControllerZone
-#define PLAYER_STATE_CLASS AFortPlayerStateZone
+#define PLAYER_CONTROLLER_CLASS AFortPlayerControllerAthena
+#define PLAYER_STATE_CLASS AFortPlayerStateAthena
 
 #define GOBJECTS_OFFSET 0x44E5CE0
 #define FNAMETOSTRING_OFFSET 0xC79B10

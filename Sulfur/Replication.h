@@ -293,14 +293,19 @@ public:
 			{
 				auto Actor = Actors[j];
 
+				/*
+
 				if (!Actor->IsA(APlayerState::StaticClass()) && !Actor->IsA(APawn::StaticClass()) && !Actor->IsA(AFortWorldManager::StaticClass()))
-					if (!Actor->bReplicates || !Actor->bNetStartup || Actor->NetDormancy == ENetDormancy::DORM_Initial)
+					if (!Actor->bReplicates || !Actor->bNetStartup || (Actor->NetDormancy == ENetDormancy::DORM_Initial && Actor->bNetStartup))
 						continue;
+
+				*/
 
 				auto Channel = this->FindChannel(Actor, NetConnection);
 
 				if (Channel == NULL)
 					Channel = this->ReplicateToClient(Actor, NetConnection);
+
 				else
 				{
 					Replication::Functions::CallPreReplication(Actor, NetConnection->Driver);

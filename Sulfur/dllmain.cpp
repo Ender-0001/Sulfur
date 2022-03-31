@@ -44,6 +44,8 @@ DWORD WINAPI MainThread(LPVOID)
     auto NewCheatManager = Globals::GPS->STATIC_SpawnObject(UCheatManager::StaticClass(), FortEngine->GameInstance->LocalPlayers[0]->PlayerController);
     FortEngine->GameInstance->LocalPlayers[0]->PlayerController->CheatManager = (UCheatManager*)(NewCheatManager);
 
+    SetMatchState = decltype(SetMatchState)(Util::FindPattern("48 89 5C 24 ? 57 48 83 EC 30 48 8B 19 48 8B F9 48 89 54 24 ? 48 8B 15 ? ? ? ? E8 ? ? ? ? 48 8B D0 4C 8D 44 24 ? 48 8B CF FF 93 ? ? ? ? 48 8B 5C 24 ? 48 83 C4 30 5F C3"));
+
     MH_Initialize();
 
     Hooks::Init();

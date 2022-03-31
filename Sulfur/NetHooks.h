@@ -65,29 +65,14 @@ namespace NetHooks
 		NetReplicator->ReplicateToClient(PlayerState, Connection);
 		NetReplicator->ReplicateToClient(Globals::World->GameState, Connection);
 
+		auto Pawn = (APlayerPawn_Athena_C*)Util::SpawnActor(APlayerPawn_Athena_C::StaticClass(), {0, 0, 1000}, {});
+		Pawn->PlayerState = PlayerState;
+
 		if (PlayerController->Pawn)
 		{
 			PlayerController->ClientSetViewTarget(PlayerController->Pawn, FViewTargetTransitionParams());
 			NetReplicator->ReplicateToClient(PlayerController->Pawn, Connection);
 		}
-
-		auto Pawn = (APlayerPawn_Athena_C*)Util::SpawnActor(APlayerPawn_Athena_C::StaticClass(), {0, 0, 1000}, {});
-		Pawn->PlayerState = PlayerState;
-		NetReplicator->ReplicateToClient(Pawn, Connection);
-		PlayerController->ClientSetViewTarget(Pawn, FViewTargetTransitionParams());
-
-		PlayerState->bHasStartedPlaying = true;
-		PlayerState->bHasFinishedLoading = true;
-		PlayerState->bIsReadyToContinue = true;
-		PlayerState->OnRep_bHasStartedPlaying();
-
-		PlayerController->bClientPawnIsLoaded = true;
-		PlayerController->bReadyToStartMatch = true;
-		PlayerController->bAssignedStartSpawn = true;
-		PlayerController->bHasInitiallySpawned = true;
-		PlayerController->bHasClientFinishedLoading = true;
-		PlayerController->bHasServerFinishedLoading = true;
-		PlayerController->OnRep_bHasServerFinishedLoading();
 
 		PlayerState->OnRep_HeroType();
 
@@ -100,6 +85,30 @@ namespace NetHooks
 		Pawn->ServerChoosePart(EFortCustomPartType::Head, UObject::FindObject<UCustomCharacterPart>("CustomCharacterPart F_Med_Head1.F_Med_Head1"));
 		Pawn->ServerChoosePart(EFortCustomPartType::Body, UObject::FindObject<UCustomCharacterPart>("CustomCharacterPart F_Med_Soldier_01.F_Med_Soldier_01"));
 		PlayerState->OnRep_CharacterParts();
+
+		PlayerController->QuickBars = (AFortQuickBars*)Util::SpawnActor(AFortQuickBars::StaticClass(), {}, {});
+		PlayerController->QuickBars->SetOwner(PlayerController);
+		PlayerController->QuickBars->OnRep_Owner();
+
+		auto Def = UObject::FindObject<UFortWeaponItemDefinition>("WID_Harvest_Pickaxe_Athena_C_T01.WID_Harvest_Pickaxe_Athena_C_T01");
+
+		auto TempItemInstance = Def->CreateTemporaryItemInstanceBP(1, 1);
+		TempItemInstance->SetOwningControllerForTemporaryItem(PlayerController);
+
+		((UFortWorldItem*)TempItemInstance)->ItemEntry.Count = 1;
+
+		auto ItemEntry = ((UFortWorldItem*)TempItemInstance)->ItemEntry;
+		PlayerController->WorldInventory->Inventory.ReplicatedEntries.Add(ItemEntry);
+		PlayerController->QuickBars->ServerAddItemInternal(ItemEntry.ItemGuid, EFortQuickBars::Primary, 0);
+
+		PlayerController->WorldInventory->HandleInventoryLocalUpdate();
+		PlayerController->HandleWorldInventoryLocalUpdate();
+		PlayerController->OnRep_QuickBar();
+		PlayerController->QuickBars->OnRep_PrimaryQuickBar();
+		PlayerController->QuickBars->OnRep_SecondaryQuickBar();
+
+		Pawn->EquipWeaponDefinition(UObject::FindObject<UFortWeaponItemDefinition>("WID_Harvest_Pickaxe_Athena_C_T01.WID_Harvest_Pickaxe_Athena_C_T01"), ItemEntry.ItemGuid);
+
 
 		PlayerController->NetConnection = Connection;
 		PlayerController->Player = Connection;
